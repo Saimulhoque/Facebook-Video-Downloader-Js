@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Video Downloader</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #progress-bar { width: 100%; background-color: #f3f3f3; }
+        #progress { width: 0; height: 30px; background-color: #4caf50; }
+    </style>
+</head>
+<body>
+    <h1>Facebook Video Downloader</h1>
+    <input type="text" id="fbUrl" placeholder="Enter Facebook Video URL">
+    <button id="downloadBtn">Download Video</button>
+
+    <div id="progress-bar">
+        <div id="progress"></div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        const fbUrlInput = document.getElementById('fbUrl');
+        const progressBar = document.getElementById('progress');
+
+        downloadBtn.addEventListener('click', () => {
+            const fbUrl = fbUrlInput.value;
+            if (fbUrl) {
+                socket.emit('download_facebook_video', fbUrl);
+            }
+        });
+
+        socket.on('progress', (data) => {
+            if (data.progress !== undefined) {
+                progressBar.style.width = data.progress + '%';
+                if (data.progress === 100) {
+                    alert('Download complete!');
+                }
+            } else if (data.error) {
+                alert('Error: ' + data.error);
+            }
+        });
+    </script>
+</body>
+</html>
